@@ -195,7 +195,7 @@ func newDiskForCloudInit(virConn *libvirt.Libvirt, volumeKey string) (libvirtxml
 		Target: &libvirtxml.DomainDiskTarget{
 			// Last device letter possible with a single IDE controller on i440FX
 			Dev: "hdd",
-			Bus: "ide",
+			Bus: "sata",
 		},
 		Driver: &libvirtxml.DomainDiskDriver{
 			Name: "qemu",
@@ -382,10 +382,7 @@ func setFirmware(d *schema.ResourceData, domainDef *libvirtxml.Domain) {
 		}
 
 		if _, ok := d.GetOk("nvram.0"); ok {
-			nvramFile := ""
-			if file, ok := d.GetOk("nvram.0.file"); ok {
-				nvramFile = file.(string)
-			}
+			nvramFile := d.Get("nvram.0.file").(string)
 			nvramTemplateFile := ""
 			if nvramTemplate, ok := d.GetOk("nvram.0.template"); ok {
 				nvramTemplateFile = nvramTemplate.(string)

@@ -116,11 +116,11 @@ func newDomainDefForConnection(virConn *libvirt.Libvirt, rd *schema.ResourceData
 		d.OS.Type.Arch = arch
 	}
 
-	if d.OS.Type.Arch == "aarch64" {
+	// if d.OS.Type.Arch == "aarch64" {
 		// for aarch64 speciffying this will automatically select the firmware and NVRAM file
 		// reference: https://libvirt.org/formatdomain.html#bios-bootloader
-		d.OS.Firmware = "efi"
-	}
+		// d.OS.Firmware = "efi"
+	// }
 
 	caps, err := getHostCapabilities(virConn)
 	if err != nil {
@@ -139,11 +139,8 @@ func newDomainDefForConnection(virConn *libvirt.Libvirt, rd *schema.ResourceData
 
 	if machine, ok := rd.GetOk("machine"); ok {
 		d.OS.Type.Machine = machine.(string)
-	} else {
-		d.OS.Type.Machine, err = getMachineTypeForArch(caps, d.OS.Type.Arch, d.OS.Type.Type)
-		if err != nil {
-			return d, err
-		}
+	} else if len(guest.Arch.Machines) > 0 {
+		d.OS.Type.Machine = guest.Arch.Machines[0].Name
 	}
 
 	canonicalmachine, err := getCanonicalMachineName(caps, d.OS.Type.Arch, d.OS.Type.Type, d.OS.Type.Machine)
